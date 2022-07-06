@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Document</title>
+</head>
+<body>
+      <h2>研究室監視アプリ</h2>        
+      <button onclick="authenticate().then(loadClient)">Google認証</button>
+      <!-- setIntervalでループして取得したい -->
+      <!-- https://drive.google.com/uc?id=14Xbyg1VpqkIC1EAUqCccMeTBra4FwRQZ -->
+      <button onclick="execute()">実行</button>
+      <br>
+      <img id="img" src="" width="60%">
+
+      <!-- js -->
+      <script script src="https://apis.google.com/js/api.js"></script>
+      <script>
+            function authenticate() {
+                  return gapi.auth2.getAuthInstance()
+                  .signIn({scope: "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.metadata https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/drive.photos.readonly https://www.googleapis.com/auth/drive.readonly"})
+                  .then(function() { console.log("Sign-in successful") },
+                        function(err) { console.error("Error signing in", err) })
+            }
+            function loadClient() {
+                  gapi.client.setApiKey("")
+                  return gapi.client.load("https://content.googleapis.com/discovery/v1/apis/drive/v3/rest")
+                  .then(function() { console.log("GAPI client loaded for API") },
+                        function(err) { console.error("Error loading GAPI client for API", err) })
+            }
+
+            function execute() {
+                  // 5分ごとにセットする
+                  window.setInterval(() => {
+                        changeImg()
+                  }, 1000)
+            }
+
+            // setInterval
+            function changeImg() {
+                  gapi.client.drive.files.list({
+                        "pageSize": 1,
+                        "q": "'1HrdtXNakA6UEVlAiqVipSete83f3BRcU' in parents"
+                  }).then(function(response) {
+                        console.log(response.result.files[0].id)
+                        var id = response.result.files[0].id
+                        // html書き換え
+                        document.getElementById('img').src = "https://drive.google.com/uc?id=" + id
+                  },function(err) { console.error("Execute error", err) })
+            }
+
+            gapi.load("client:auth2", function() {
+                  gapi.auth2.init({client_id: ""})
+            })
+      </script>
+</body>
+</html>
