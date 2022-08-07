@@ -5,13 +5,23 @@
       <meta http-equiv="X-UA-Compatible" content="IE=edge">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>研究室監視アプリ</title>
+      <link rel="stylesheet" href="style.css">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> 
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
 </head>
 <body>
-      <h2>研究室監視アプリ</h2>
       <button onclick="authenticate().then(loadClient)">Google認証</button>
       <button onclick="execute()">実行</button>
-      <br><br>
-      <img id="img" src="" width="60%">
+      <div style="display:flex;justify-content:space-between;">
+            <div style="margin-left:20%;">
+                  <img id="img" width="90%">
+            </div>
+            <div style="margin-right:20%;">
+                  <p>QRコードを読み取ると？</p>
+                  <div id="img-qr"></div>
+            </div>
+      </div>
+      
       <!-- js -->
       <script script src="https://apis.google.com/js/api.js"></script>
       <script>
@@ -28,20 +38,26 @@
                         function(err) { console.error("Error loading GAPI client for API", err) })
             }
             function execute() {
+                  imaggeUrl = changeImg()
                   window.setInterval(() => {
                         changeImg()
-                  }, 60000)
+                  }, 30000)
             }
             function changeImg() {
-                  gapi.client.drive.files.list({
+                  return gapi.client.drive.files.list({
                         "pageSize": 1,
                         "q": "'14HEjmqPoR2D1jJeeth3xhWARbRUuHCwz' in parents"
                   }).then(function(response) {
-                        console.log(response.result.files[0].id)
+                        // console.log(response.result.files[0].id)
                         var id = response.result.files[0].id
                         // html書き換え
-                        document.getElementById('img').src = "https://drive.google.com/uc?id=" + id
-                  },function(err) { console.error("Execute error", err) })
+                        imageUrl = "https://drive.google.com/uc?id=" + id
+                        document.getElementById('img').src = imageUrl
+                        var utf8qrtext = unescape(encodeURIComponent(imageUrl))
+                        $("#img-qr").html("")
+                        $("#img-qr").qrcode({text:utf8qrtext})
+                        return "https://drive.google.com/uc?id=" + id
+                  })
             }
             gapi.load("client:auth2", function() {
                   gapi.auth2.init({client_id: ""})
