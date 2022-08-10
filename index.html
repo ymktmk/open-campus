@@ -11,12 +11,12 @@
 </head>
 <body>
       <button onclick="authenticate().then(loadClient)">Google認証</button>
-      <button onclick="execute()">実行</button>
+      <button onclick="execute()">実行</button><br><br>
       <div style="display:flex;justify-content:space-between;">
-            <div style="margin-left:20%;">
+            <div style="margin-left:3%;">
                   <img id="img" width="90%">
             </div>
-            <div style="margin-right:20%;">
+            <div style="margin-right:2%;">
                   <p>QRコードを読み取ると？</p>
                   <div id="img-qr"></div>
             </div>
@@ -46,10 +46,11 @@
             function changeImg() {
                   return gapi.client.drive.files.list({
                         "pageSize": 1,
-                        "q": "'14HEjmqPoR2D1jJeeth3xhWARbRUuHCwz' in parents"
+                        "q": "'140kJJgDzAYMWPfrDh7GaHzSEJhbCCSUL' in parents"
                   }).then(function(response) {
                         // console.log(response.result.files[0].id)
                         var id = response.result.files[0].id
+                        console.log(id)
                         // html書き換え
                         imageUrl = "https://drive.google.com/uc?id=" + id
                         document.getElementById('img').src = imageUrl
